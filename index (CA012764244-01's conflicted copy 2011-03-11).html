@@ -429,33 +429,34 @@
           doc.save()
           success() if success?
         else
-          $('#dialog-save').dialog
-            title: "Save file as..."
-            modal: true
-            movable: false
-            resizable: false
-            width: '400px'
-            buttons:
-              'Save': =>
-                filename = $('#dialog-save-filename').val()
-                if @collection.get(filename)?
-                  $('#dialog-save-filename').addClass('ui-state-error').select().focus()
-                  $('#dialog-save-error').show()
-                else
-                  console.log "Saving active document", doc, "as", filename if debug?
-                  doc.set
-                    id: filename
-                    title: filename
-                  doc.save()
-                  
-                  @session.open(doc)
-                  
-                  $('#dialog-save').dialog('close')
-                  
-                  success() if success?
-              'Cancel': ->
-                $(this).dialog('close')
-                cancel() if cancel?
+          $('#dialog-save')
+            .dialog
+              title: "Save file as..."
+              modal: true
+              movable: false
+              resizable: false
+              width: '400px'
+              buttons:
+                'Save': =>
+                  filename = $('#dialog-save-filename').val()
+                  if @collection.get(filename)?
+                    $('#dialog-save-filename').addClass('ui-state-error').select().focus()
+                    $('#dialog-save-error').show()
+                  else
+                    console.log "Saving active document", doc, "as", filename if debug?
+                    doc.set
+                      id: filename
+                      title: filename
+                    doc.save()
+                    
+                    @session.open(doc)
+                    
+                    $('#dialog-save').dialog('close')
+                    
+                    success() if success?
+                'Cancel': ->
+                  $(this).dialog('close')
+                  cancel() if cancel?
       
       handleEditorOpen: =>
         console.log "Filearts.handleEditorOpen", arguments... if debug?
