@@ -1,77 +1,508 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset='utf-8'>
-
-  <title>ggoodman/filearts @ GitHub</title>
-
-  <style type="text/css">
-    body {
-      margin-top: 1.0em;
-      background-color: #c4833a;
-      font-family: Helvetica, Arial, FreeSans, san-serif;
-      color: #000000;
-    }
-    #container {
-      margin: 0 auto;
-      width: 700px;
-    }
-    h1 { font-size: 3.8em; color: #3b7cc5; margin-bottom: 3px; }
-    h1 .small { font-size: 0.4em; }
-    h1 a { text-decoration: none }
-    h2 { font-size: 1.5em; color: #3b7cc5; }
-    h3 { text-align: center; color: #3b7cc5; }
-    a { color: #3b7cc5; }
-    .description { font-size: 1.2em; margin-bottom: 30px; margin-top: 30px; font-style: italic;}
-    .download { float: right; }
-    pre { background: #000; color: #fff; padding: 15px;}
-    hr { border: 0; width: 80%; border-bottom: 1px solid #aaa}
-    .footer { text-align:center; padding-top:30px; font-style: italic; }
-  </style>
+  <title>FileArts</title>
+  <script type="text/javascript" src="lib/jquery.js"></script>
+  <script type="text/javascript" src="lib/jquery-ui.js"></script>
+  <script type="text/javascript" src="lib/coffee-script.js"></script>
+  <script type="text/javascript" src="lib/underscore-min.js"></script>
+  <script type="text/javascript" src="lib/backbone-min.js"></script>
+  <script type="text/javascript" src="lib/backbone.localStorage.js"></script>
+  <script type="text/javascript" src="lib/ace/ace.js" charset="utf-8"></script>
+  <script type="text/javascript" src="lib/ace/mode-c_cpp.js" charset="utf-8"></script>
+  <script type="text/javascript" src="lib/ace/mode-coffee.js" charset="utf-8"></script>
+  <script type="text/javascript" src="lib/ace/mode-csharp.js" charset="utf-8"></script>
+  <script type="text/javascript" src="lib/ace/mode-css.js" charset="utf-8"></script>
+  <script type="text/javascript" src="lib/ace/mode-html.js" charset="utf-8"></script>
+  <script type="text/javascript" src="lib/ace/mode-java.js" charset="utf-8"></script>
+  <script type="text/javascript" src="lib/ace/mode-javascript.js" charset="utf-8"></script>
+  <script type="text/javascript" src="lib/ace/mode-perl.js" charset="utf-8"></script>
+  <script type="text/javascript" src="lib/ace/mode-php.js" charset="utf-8"></script>
+  <script type="text/javascript" src="lib/ace/mode-python.js" charset="utf-8"></script>
+  <script type="text/javascript" src="lib/ace/mode-ruby.js" charset="utf-8"></script>
+  <script type="text/javascript" src="lib/ace/mode-xml.js" charset="utf-8"></script>
+  <script type="text/javascript" src="lib/ace/theme-twilight.js" charset="utf-8"></script>
+  <script type="text/javascript" src="lib/jquery.dropdown.js"></script>
+  <link rel="stylesheet" type="text/css" href="css/Aristo/jquery-ui-1.8.7.custom.css" />
+  <link rel="stylesheet" type="text/css" href="css/jquery.dropdown.css" />
+  <link rel="stylesheet" type="text/css" href="css/filearts.css" />
 </head>
 
 <body>
-  <a href="http://github.com/ggoodman/filearts"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" /></a>
-
-  <div id="container">
-
-    <div class="download">
-      <a href="http://github.com/ggoodman/filearts/zipball/master">
-        <img border="0" width="90" src="http://github.com/images/modules/download/zip.png"></a>
-      <a href="http://github.com/ggoodman/filearts/tarball/master">
-        <img border="0" width="90" src="http://github.com/images/modules/download/tar.png"></a>
+  <div id="toolbar" class="ui-widget ui-widget-header">
+    <button id="tb-new">New</button>
+    <button id="tb-open">Open</button>
+    <button id="tb-save">Save</button>
+    <button id="tb-preview">Preview</button>
+    <select id="tb-mode" title="Source code hilighting">
+    </select>
     </div>
-
-    <h1><a href="http://github.com/ggoodman/filearts">filearts</a>
-      <span class="small">by <a href="http://github.com/ggoodman">ggoodman</a></span></h1>
-
-    <div class="description">
-      Online website programming interface
-    </div>
-
-    <h2>Authors</h2>
-<p>Geoffrey Goodman (ggoodman@gmail.com)<br/><br/>      </p>
-<h2>Contact</h2>
-<p> (ggoodman@gmail.com)<br/>      </p>
-
-
-    <h2>Download</h2>
-    <p>
-      You can download this project in either
-      <a href="http://github.com/ggoodman/filearts/zipball/master">zip</a> or
-      <a href="http://github.com/ggoodman/filearts/tarball/master">tar</a> formats.
-    </p>
-    <p>You can also clone the project with <a href="http://git-scm.com">Git</a>
-      by running:
-      <pre>$ git clone git://github.com/ggoodman/filearts</pre>
-    </p>
-
-    <div class="footer">
-      get the source code on GitHub : <a href="http://github.com/ggoodman/filearts">ggoodman/filearts</a>
-    </div>
-
   </div>
+  <div id="tabbar">
+    <ul id="tabbar-list">
+    </ul>
+  </div>
+  <div id="content"><div id="editor"></div><div id="preview" class="ui-helper-hidden"></div></div>
+  <div id="dialog-save" class="ui-helper-hidden">
+		<div id="dialog-save-error" class="ui-widget ui-helper-hidden"> 
+			<div class="ui-state-error ui-corner-all" style="padding: 0 .7em;"> 
+				<p><span class="ui-icon ui-icon-alert" style="float: left; margin-right: .7em;"></span> 
+				<strong>Error:</strong> A file by that name already exists </p> 
+			</div> 
+		</div>
+    <p><label>Filename<input id="dialog-save-filename" placeholder="Enter filename..." /></label></p>
+  </div>
+  <div id="dialog-open" class="ui-helper-hidden">
+    <div id="dialog-open-filelist">
+    </div>
+  </div>
+  <div id="dialog-close" class="ui-helper-hidden">
+    <p>Your work has not been saved. Would you like to save this file now?</p>
+  </div>
+  <script type="text/coffeescript">
+    debug = true
+    EditSession = require('ace/edit_session').EditSession
+    
+    class Session extends Backbone.Model
+      localStorage: new Store('filearts:session')
+      
+      initialize: ->
+        @set {open: []} if not @get('open')?
+        
+      open: (doc) ->
+        console.log "Session.open", arguments... if debug?
+        
+        open = @get('open')
+        open.push(doc.get('id'))
+        
+        @save {open: open}
+      
+      close: (doc) ->
+        console.log "Session.close", arguments... if debug?
+        
+        open = @get('open')
+        open = _.without open, doc.get('id')
+        
+        @save {open: open}
 
-  
+    
+    
+    class Document extends Backbone.Model
+      dirty: false
+      
+      initialize: ->
+        @savedContent = @get('content')
+        @bind 'save', => @savedContent = @get('content')
+        
+      toJSON: =>
+        id: @get('id')
+        title: @get('title')
+        format: @get('format')
+        content: @get('content')
+      
+      isDirty: -> @savedContent != @get('content')
+      
+      reset: ->
+        @set({content: @savedContent})
+      
+      save: (attribs) ->
+        super attribs,
+          success: (model, response) =>
+            @trigger 'save', model
+    
+
+    class Documents extends Backbone.Collection
+      model: Document
+      localStorage: new Store('filearts:documents')
+    
+
+    class Toolbar extends Backbone.View
+      el: $('#toolbar')
+        
+      initialize: ->
+        iconify = (options) ->
+          for sel, icon of options
+            $(sel).button
+              icons: {primary: icon}
+        
+        iconify
+          '#tb-new': 'ui-icon-document'
+          '#tb-save': 'ui-icon-disk'
+          '#tb-open': 'ui-icon-folder-open'
+          '#tb-preview': 'ui-icon-newwin'
+        
+        @new = $('#tb-new')
+        @open = $('#tb-open')
+        @save = $('#tb-save').button 'disable'
+        @preview = $('#tb-preview').button 'disable'
+        
+        for mode in @options.modes
+          $('<option />',{text: mode, value: mode}).appendTo('#tb-mode')
+        
+        @mode = $('#tb-mode').change((mode) => @trigger 'mode:change', $('#tb-mode').val())
+        
+        @new.click => @trigger 'document:create'
+        @open.click => @trigger 'editor:open'
+        @save.click => @trigger 'document:save', @activeDocument
+        @preview.click => @trigger 'document:preview', @activeDocument
+
+        @bind 'document:activate', @handleDocumentActivate
+      
+      getCurrentFormat: -> @$('#tb-mode').val()
+
+      handleDocumentActivate: (model) =>
+        console.log "Toolbar.handleDocumentActivate", arguments... if debug?
+        @activeDocument = model
+        @mode.val(model.get('format'))
+        @save.button 'enable'
+        @preview.button 'enable'
+    
+
+    class Tabbar extends Backbone.View
+      el: $('#tabbar')
+      models: {}
+      
+      initialize: ->
+        @el.tabs
+          show: (e, ui) => @trigger 'document:activate', @models[ui.panel.id]
+          tabTemplate: '<li><a class="ui-tabs-title" href="#{href}"><span>#{label}</span></a><a class="ui-tabs-close ui-corner-all" href="#{href}" title="Close"><span class="ui-icon ui-icon-close">Close</span></a></li>'
+        
+        @bind 'document:open', @handleDocumentOpen
+        @bind 'document:close', @handleDocumentClose
+      
+      makeTabTitle: (doc) ->
+        title = doc.get('title')
+        title += " *" if doc.isDirty()
+        title
+      
+      handleDocumentClose: (doc) =>
+        id = 'fa-doc-' + doc.cid
+        hash = '#' + id
+        
+        @el.tabs('remove', hash)
+      
+      handleDocumentOpen: (doc) =>
+        console.log "Tabbar.handleDocumentOpen", arguments... if debug?
+        
+        title = @makeTabTitle(doc)
+        
+        id = 'fa-doc-' + doc.cid
+        hash = '#' + id
+        div = $('<div />', {id: id})
+        
+        updateTitle = (type, doc) =>
+          id = '#fa-doc-' + doc.cid
+          title = @makeTabTitle(doc)
+          $("#tabbar a[href=#{id}] span").text(title)
+
+        doc.bind 'all', updateTitle
+
+        @models[id] = doc
+
+        @el
+          .tabs('add', hash, title)
+          .tabs('select', hash)
+        
+        $("#tabbar a[href=#{hash}].ui-tabs-close").click =>
+          @trigger 'document:closing', doc        
+
+
+    class Editor extends Backbone.View
+      el: $('#editor')
+      
+      initialize: ->        
+        @bind 'document:activate', @handleDocumentActivate
+        @bind 'document:open', @handleDocumentOpen
+        @bind 'mode:change', @handleModeChange
+      
+      handleDocumentActivate: (model) =>
+        console.log "Editor.handleDocumentActivate", arguments... if debug?
+        
+        @activeDocument = model
+        
+        setSession = =>
+          @editor = ace.edit 'editor' if not @editor?
+          @editor.setSession model.get('session')
+          @editor.focus()
+        
+        _.debounce(setSession, 100)()
+      
+      handleDocumentClose: (doc) =>
+        @activeDocument = null
+        @editor.setSession new EditSession
+        
+        delete doc.get('session')
+    
+      handleDocumentOpen: (model) =>
+        console.log "Editor.handleDocumentOpen", arguments... if debug?
+        
+        session = new EditSession(model.get('content'), @options.modes[model.get('format')])
+        updateContent = =>
+          content = @editor.getSession().toString()
+          @activeDocument.set {content: content}
+        
+        session.on 'change', _.debounce(updateContent, 100)
+        
+        model.set {session: session}
+
+      handleModeChange: (mode) =>
+        console.log "Editor.handleModeChange", arguments... if debug?
+        
+        @activeDocument.set
+          'format': mode
+          
+        @editor.getSession().setMode @options.modes[mode] if @options.modes[mode]?
+
+
+    class Filearts extends Backbone.View
+      defaultFormat: 'text'
+      
+      initialize: ->
+        @session = new Session {id: 'filearts-session'}
+        @session.fetch()
+        
+        modes =
+          'c/c++': 'ace/mode/c_cpp'
+          'c#': 'ace/mode/csharp'
+          'coffeescript': 'ace/mode/coffee'
+          'css': 'ace/mode/css'
+          'html': 'ace/mode/html'
+          'java': 'ace/mode/java'
+          'javascript': 'ace/mode/javascript'
+          'perl': 'ace/mode/perl'
+          'php': 'ace/mode/php'
+          'python': 'ace/mode/python'
+          'ruby': 'ace/mode/ruby'
+          'text': 'ace/mode/text'
+          'xml': 'ace/mode/xml'
+        
+        for name, path of modes
+          Mode = require(path).Mode
+          modes[name] = new Mode()
+
+        @toolbar = new Toolbar {modes: _(modes).keys()}
+        @tabbar = new Tabbar
+        @editor = new Editor {modes: modes}
+        
+        @toolbar.filearts = @tabbar.filearts = @editor.filearts = this
+      
+        @collection.bind 'refresh', @handleLoadAllDocuments
+        @collection.bind 'add', @handleDocumentOpen
+        
+        @toolbar.bind 'document:create', @handleDocumentCreate
+        @toolbar.bind 'editor:open', @handleEditorOpen
+        @toolbar.bind 'document:save', @handleDocumentSave
+        @toolbar.bind 'document:preview', @handleDocumentPreview
+        @toolbar.bind 'mode:change', @handleModeChange
+        
+        @tabbar.bind 'document:activate', @handleDocumentActivate
+        @tabbar.bind 'document:closing', @handleDocumentClosing
+        
+        @collection.fetch()
+      
+      handleDocumentActivate: (doc) =>
+        console.log "Filearts.handleDocumentActivate", arguments... if debug?
+        @editor.trigger 'document:activate', doc
+        @toolbar.trigger 'document:activate', doc
+      
+      handleDocumentClosing: (doc) =>
+        console.log "Filearts.handleDocumentClosing", arguments... if debug?
+        
+        triggerClose = =>
+          console.log "Filearts.triggerClose", arguments... if debug?
+          
+          @session.close(doc)
+          
+          @editor.trigger 'document:close', doc
+          @tabbar.trigger 'document:close', doc
+          
+          @collection.remove(doc) if not doc.isNew()
+        
+          if not @tabbar.el.tabs('length')
+            @handleDocumentCreate()
+        
+        if not doc.isDirty()
+          triggerClose(doc)
+        else
+          $('#dialog-close').dialog
+            title: "Save file?"
+            modal: true
+            movable: false
+            resizable: false
+            width: '400px'
+            buttons:
+              'Yes': =>
+                $('#dialog-close').dialog('close')
+                doc.set {open:false}
+                @toolbar.trigger 'document:save', doc, triggerClose, =>
+                  doc.set {open: true}
+              'No': =>
+                $('#dialog-close').dialog('close')
+                doc.save({content: doc.savedContent, open: false}) if not doc.isNew()
+                triggerClose(doc)
+        
+      handleDocumentCreate: =>
+        console.log "Filearts.handleDocumentCreate", arguments... if debug?
+        suffix = 1
+        while @collection.get('Untitled' + suffix)
+          suffix += 1
+        title = 'Untitled' + suffix
+        
+        @collection.add new Document
+          title: title
+          content: ""
+          format: @defaultFormat
+          open: true
+      
+      handleDocumentOpen: (doc) =>
+        console.log "Filearts.handleDocumentOpen", arguments... if debug?
+        
+        @session.open(doc) if not doc.isNew()
+        
+        @editor.trigger 'document:open', doc
+        @toolbar.trigger 'document:open', doc
+        @tabbar.trigger 'document:open', doc
+      
+      handleDocumentPreview: (doc) =>
+        console.log "Filearts.handleDocumentPreview", arguments... if debug?
+        
+        index = @collection.get('index.html')
+        
+        if not index
+          alert "You must have a file named index.html to use this feature"
+          return
+        
+        mimes =
+          'html': 'text/html'
+          'javascript': 'text/javascript'
+          'css': 'text/css'
+        
+        files = {}
+        
+        urlBase = if window.createObjectURL? then window else window.webkitURL
+        
+        buildBlob = (id, mime, content) =>
+          bb = new BlobBuilder
+          bb.append content
+          files[id] = urlBase.createObjectURL(bb.getBlob(mime))
+          
+        @collection.each (doc) =>
+          buildBlob(doc.get('id'), mimes[doc.get('format')], doc.get('content')) if doc.get('id') isnt 'index.html'
+        
+        html = index.get('content')
+        
+        for filename, url of files
+          regex = new RegExp(filename, 'g')
+          html = html.replace(regex, url)
+        
+        buildBlob 'index.html', 'text/html', html
+        
+        url = files['index.html']
+        $div = $("<div />").hide()
+        
+        $iframe = $("<iframe src=\"#{url}\" />")
+          .css
+            border: '0'
+            width: '100%'
+            height: '100%'
+            margin: '0'
+            padding: '0'
+          .appendTo($div)
+          .load ->
+            $div.dialog 'option', 'title', $iframe.contents().find('title').text()
+        $div.dialog
+          title: "Filearts.com Preview"
+          modal: true
+          width: 600
+          height: 400
+          close: ->
+            urlBase.revokeObjectURL(url) for id, url of files
+            $iframe.remove()
+            $div.remove()
+        
+      handleDocumentSave: (doc, success, cancel) =>
+        console.log "Filearts.handleDocumentSave", arguments... if debug?
+        
+        $('#dialog-save-filename').val('')
+		
+        if not doc.isNew()
+          doc.save()
+          success() if success?
+        else
+          $('#dialog-save').dialog
+            title: "Save file as..."
+            modal: true
+            movable: false
+            resizable: false
+            width: '400px'
+            buttons:
+              'Save': =>
+                filename = $('#dialog-save-filename').val()
+                if @collection.get(filename)?
+                  $('#dialog-save-filename').addClass('ui-state-error').select().focus()
+                  $('#dialog-save-error').show()
+                else
+                  console.log "Saving active document", doc, "as", filename if debug?
+                  doc.set
+                    id: filename
+                    title: filename
+                  doc.save()
+                  
+                  @session.open(doc)
+                  
+                  $('#dialog-save').dialog('close')
+                  
+                  success() if success?
+              'Cancel': ->
+                $(this).dialog('close')
+                cancel() if cancel?
+      
+      handleEditorOpen: =>
+        console.log "Filearts.handleEditorOpen", arguments... if debug?
+        
+        $('#dialog-open-filelist').empty()
+        
+        @collection.each (doc) =>
+          title = doc.get('title')
+          $input = $('<input />', {type: 'checkbox', value: title})
+          $label = $('<label />', {text: title})
+            .prepend($input)
+            .wrap('<div />')
+            .parent().appendTo('#dialog-open-filelist')
+          
+          console.log $input.attr('checked', 'checked').attr('disabled', 'disabled') if doc.get('id') in @session.get('open') or doc.isNew()
+        
+        $('#dialog-open').dialog
+          title: "Select file(s) to open"
+          modal: true
+          movable: false
+          resizable: false
+          width: '400px'
+          buttons:
+            'Open': =>
+              $('#dialog-open-filelist input:checked:enabled').each (i, el) =>
+                @handleDocumentOpen @collection.get($(el).val())
+              $('#dialog-open').dialog('close')
+            'Cancel': =>
+              $('#dialog-open').dialog('close')
+
+      handleLoadAllDocuments: (docs) =>
+        console.log "Filearts.handleLoadAllDocuments", arguments... if debug?
+        
+        docs.each (doc) =>
+          @handleDocumentOpen doc if (doc.get('id') in @session.get('open'))
+        
+        if not @session.get('open').length
+          @handleDocumentCreate()
+       
+      handleModeChange: (mode) =>
+        console.log "Filearts.handleModeChange", arguments... if debug?
+        
+        @editor.trigger 'mode:change', mode
+       
+    $ ->
+      filearts = new Filearts {collection: new Documents}
+  </script>
 </body>
+
 </html>

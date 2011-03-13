@@ -1,0 +1,35 @@
+window, body {
+  margin: 0; padding: 0;
+  font-size: 80%;
+  height: 100%;
+}
+
+/* TOOLBAR */
+#toolbar {
+  height: 36px;
+  vertical-align: middle;
+  position: relative;
+}
+#toolbar .ui-dropdown {
+  position: absolute;
+  right: 4px;
+  top: 0px;
+}
+
+/* TAB BAR */
+#tabbar div.ui-tabs-panel {
+  position: absolute;
+  top: -9999px;
+}
+
+/* EDITOR */
+#editor {
+  position: absolute;
+  top: 67px;
+  left: 0; right: 0; bottom: 0;
+}
+
+.ui-tabs .ui-tabs-close { position:relative; right:2px; top: 8px; margin-left: -4px;}
+.ui-tabs .ui-tabs-close span { background-position: -0px -16px !important; cursor: pointer !important; }
+.ui-tabs .ui-tabs-close:hover span { background-position: -16px -16px !important; }
+.ui-tabs .ui-tabs-close span { display: block; position: absolute; left: 50%; margin-left: -8px; top: 50%; margin-top: -8px; background: url(Aristo/images/icon_sprite.png) no-repeat; }
